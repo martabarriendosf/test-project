@@ -1,0 +1,29 @@
+name: CI/CD with Terraform
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Make scripts executable
+        run: chmod +x cicd/install-terraform.sh cicd/apply-terraform.sh
+
+      - name: Install Terraform
+        run: ./cicd/install-terraform.sh
+
+      - name: Apply Terraform
+        run: ./cicd/apply-terraform.sh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
