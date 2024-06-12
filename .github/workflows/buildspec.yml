@@ -16,8 +16,8 @@ jobs:
 
       - name: Convert end of line characters
         run: |
-          sudo yum update -y
-          sudo yum install -y dos2unix
+          sudo apt-get update
+          sudo apt-get install -y dos2unix
           dos2unix ./cicd/install-terraform.sh
           dos2unix ./cicd/apply-terraform.sh
       
