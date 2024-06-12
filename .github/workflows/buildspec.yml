@@ -14,6 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Convert end of line characters
+        run: |
+          sudo yum update -y
+          sudo yum install -y dos2unix
+          dos2unix ./cicd/install-terraform.sh
+          dos2unix ./cicd/apply-terraform.sh
+      
+
       - name: Make scripts executable
         run: chmod +x cicd/install-terraform.sh cicd/apply-terraform.sh
 
