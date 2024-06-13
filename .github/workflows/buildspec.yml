@@ -42,7 +42,6 @@ jobs:
                 commands:
                   - name: Checkout code
                     uses: actions/checkout@v2
-                    
                   - cd cicd
                   - chmod +x install-terraform.sh apply-terraform.sh
                   - ./cicd/install-terraform.sh
