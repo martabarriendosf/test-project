@@ -38,10 +38,12 @@ jobs:
           buildspec-override: |
             version: 0.2
             phases:
-              commands:
-                - cd cicd
-                - chmod +x install-terraform.sh apply-terraform.sh
-                - install-terraform.sh
+              install:
+
+                commands:
+                  - cd cicd
+                  - chmod +x install-terraform.sh apply-terraform.sh
+                  - install-terraform.sh
               
               build:
                 commands:
