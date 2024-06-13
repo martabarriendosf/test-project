@@ -34,7 +34,6 @@ jobs:
         with:
           project-name: my-codebuild-job
           disable-source-override: true
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
           buildspec-override: |
             version: 0.2
             phases:
@@ -45,9 +44,15 @@ jobs:
                   - chmod +x install-terraform.sh apply-terraform.sh
                   - install-terraform.sh
               
+              pre_build:
+                commands:
+                  - echo "Pre-build phase"
               build:
                 commands:
                   - /apply-terraform.sh
+
+              post_build:
+                - echo "Post-build phase"
 
               artifacts:
                 files:
