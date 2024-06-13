@@ -38,13 +38,11 @@ jobs:
             version: 0.2
             phases:
               install:
-
                 commands:
                   - name: Checkout code
-                    run: |
-                      git fetch --depth=1
-                      git checkout --force ${{ github.sha }}
-                      git lfs pull
+                    uses: actions/checkout@v2
+                    with:
+                      fetch-depth: 1
                   - cd cicd
                   - chmod +x install-terraform.sh apply-terraform.sh
                   - ./cicd/install-terraform.sh
