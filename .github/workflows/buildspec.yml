@@ -55,7 +55,7 @@ jobs:
               build:
                 commands:
                   - cd .. 
-                  - terraform init -backend-config="bucket=terraform-state-fromgit"
+                  - terraform init 
                   - terraform apply -auto-approve
 
               post_build:
