@@ -7,10 +7,10 @@ set -eu
 #cd .. 
 
 # initialize terraform
-terraform init
+terraform init -backend-config="bucket=${AWS_S3_BUCKET}"
 
 # # apply terraform
-#terraform apply -auto-approve
+terraform apply -auto-approve
 
 # destroy terraform
-terraform destroy -auto-approve
+#terraform destroy -auto-approve

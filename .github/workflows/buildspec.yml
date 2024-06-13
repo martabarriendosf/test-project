@@ -9,30 +9,41 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    env:
+      AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Convert end of line characters
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dos2unix
-          dos2unix ./cicd/install-terraform.sh
-          dos2unix ./cicd/apply-terraform.sh
-      
-
-      - name: Make scripts executable
-        run: chmod +x cicd/install-terraform.sh cicd/apply-terraform.sh
-
-      - name: Install Terraform
-        run: ./cicd/install-terraform.sh
-
-      - name: Apply Terraform
-        run: ./cicd/apply-terraform.sh
-        env:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          
+
+      - name: Run CodeBuild
+        uses: aws-actions/aws-codebuild-run-build@v1
+        with:
+          project-name: my-codebuild-job
+          disable-source-override: true
+          buildspec-override: |
+            version: 0.2
+            phases:
+              commands:
+                - cd cicd
+                - chmod +x install-terraform.sh apply-terraform.sh
+                - install-terraform.sh
+              
+              build:
+                commands:
+                  - /apply-terraform.sh
+
+              artifacts:
+                files:
+                  - '**/*'
 
