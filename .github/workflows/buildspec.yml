@@ -54,7 +54,8 @@ jobs:
                   - echo "Pre-build phase"
               build:
                 commands:
-                  - /apply-terraform.sh
+                  - terraform init -backend-config="bucket=${AWS_S3_BUCKET}"
+                  - terraform apply -auto-approve
 
               post_build:
                 commands:
