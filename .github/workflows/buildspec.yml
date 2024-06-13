@@ -42,7 +42,7 @@ jobs:
                 commands:
                   - cd cicd
                   - chmod +x install-terraform.sh apply-terraform.sh
-                  - /install-terraform.sh
+                  - ./cicd/install-terraform.sh
               
               pre_build:
                 commands:
