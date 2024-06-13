@@ -55,7 +55,7 @@ jobs:
                 commands:
                   - echo "Post-build phase"
 
-              artifacts:
-                files:
-                  - '**/*'
+            artifacts:
+              files:
+                - '**/*'
 
