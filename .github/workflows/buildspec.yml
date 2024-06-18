@@ -49,7 +49,7 @@ jobs:
                   - echo "Pre-build phase"
               build:
                 commands:
-                  - terraform init -backend-config="bucket=terraform-state2-test" -backend-config="key=terraform.tfstate" -backend-config="region=us-east-1"
+                  - terraform init -backend-config="new-s3-tf-state" -backend-config="key=terraform.tfstate" -backend-config="region=us-east-1"
                   - terraform apply -auto-approve
 
               post_build:
