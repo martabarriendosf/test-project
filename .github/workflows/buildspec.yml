@@ -50,7 +50,7 @@ jobs:
               build:
                 commands:
                   - terraform init -backend-config="bucket=${{ env.AWS_S3_BUCKET }}"
-                  - terraform destroy -auto-approve
+                  - terraform apply -auto-approve
 
               post_build:
                 commands:
@@ -59,4 +59,3 @@ jobs:
             artifacts:
               files:
                 - '**/*'
-                
