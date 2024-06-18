@@ -18,9 +18,6 @@ jobs:
 
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-          
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -34,7 +31,6 @@ jobs:
         with:
           project-name: my-codebuild-job2
           disable-source-override: true
-          compute-type-override: BUILD_GENERAL1_LARGE
           buildspec-override: |
             version: 0.2
             phases:
