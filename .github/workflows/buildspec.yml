@@ -65,4 +65,3 @@ jobs:
             artifacts:
               files:
                 - '**/*'
-                
