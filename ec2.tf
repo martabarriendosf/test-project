@@ -3,6 +3,15 @@ provider "aws" {
   region  = "us-east-1"
 }
 
+# store the terraform state file in s3
+terraform {
+  backend "s3" {
+    bucket  = "terraform-state2-test"
+    key     = "terraform.tfstate" #Name we want to give to the state file in the bucket
+    region  = "us-east-1"
+
+  }
+}
 
 
 # create default vpc if one does not exit
