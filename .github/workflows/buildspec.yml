@@ -39,8 +39,6 @@ jobs:
                   - git fetch --depth=1
                   - git checkout --force ${{ github.sha }}
                   - git lfs pull
-                  - cd cicd
-                  - chmod +x install-terraform.sh apply-terraform.sh
                   - sudo yum install -y yum-utils
                   - sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
                   - sudo yum -y install terraform
@@ -53,7 +51,7 @@ jobs:
                 commands:
                   - cd .. 
                   - terraform init 
-                  - terraform apply -auto-approve
+                  - terraform destroy -auto-approve
 
               post_build:
                 commands:
