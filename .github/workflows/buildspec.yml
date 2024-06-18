@@ -49,8 +49,7 @@ jobs:
                   - echo "Pre-build phase"
               build:
                 commands:
-                  - echo "Valor de AWS_S3_BUCKET: ${AWS_S3_BUCKET}"
-                  - terraform init -backend-config="bucket=${AWS_S3_BUCKET}"
+                  - terraform init -backend-config="bucket=terraform-state2-test"
                   - terraform apply -auto-approve
 
               post_build:
