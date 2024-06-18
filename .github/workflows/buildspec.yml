@@ -49,8 +49,8 @@ jobs:
                   - echo "Pre-build phase"
               build:
                 commands:
-                  - terraform init -backend-config="bucket=terraform-state2-test"
-                  - terraform apply -auto-approve
+                  - terraform init -backend-config="bucket=${{ AWS_S3_BUCKET }}"
+                  - terraform destroy -auto-approve
 
               post_build:
                 commands:
