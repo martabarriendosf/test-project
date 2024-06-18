@@ -50,7 +50,7 @@ jobs:
               build:
                 commands:
                   - terraform init -backend-config="bucket=${{ env.AWS_S3_BUCKET }}" -backend-config="key=terraform.tfstate" -backend-config="region=${{ env.AWS_DEFAULT_REGION }}"
-                  - terraform destroy -auto-approve
+                  - terraform apply -auto-approve
 
               post_build:
                 commands:
