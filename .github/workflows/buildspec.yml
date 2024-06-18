@@ -34,6 +34,7 @@ jobs:
         with:
           project-name: my-codebuild-job2
           disable-source-override: true
+          compute-type-override: BUILD_GENERAL1_LARGE_SPOT
           buildspec-override: |
             version: 0.2
             phases:
