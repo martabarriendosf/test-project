@@ -7,7 +7,7 @@ provider "aws" {
 # store the terraform state file in s3
 terraform {
   backend "s3" {
-    bucket  = "terraform-state-fromgit"
+    bucket  = "terraform-state2-test"
     key     = "terraform.tfstate" #Name we want to give to the state file in the bucket
     region  = "us-east-1"
 
