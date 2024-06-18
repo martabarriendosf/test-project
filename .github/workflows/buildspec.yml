@@ -15,6 +15,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+
     
     steps:
       - name: Checkout code
@@ -31,7 +32,7 @@ jobs:
       - name: Run CodeBuild
         uses: aws-actions/aws-codebuild-run-build@v1
         with:
-          project-name: my-codebuild-job2
+          project-name: my-codebuild-job
           disable-source-override: true
           buildspec-override: |
             version: 0.2
@@ -40,6 +41,7 @@ jobs:
                 commands:
                   - git fetch --depth=1
                   - git checkout --force ${{ github.sha }}
+                  - git lfs pull
                   - cd cicd
                   - chmod +x install-terraform.sh apply-terraform.sh
                   - sudo yum install -y yum-utils
@@ -54,7 +56,7 @@ jobs:
                 commands:
                   - cd .. 
                   - terraform init 
-                  - terraform destroy -auto-approve
+                  - terraform apply -auto-approve
 
               post_build:
                 commands:
