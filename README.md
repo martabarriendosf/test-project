@@ -1,3 +1,4 @@
+enecccdkeilbinibthlinffljkurbjhruvduntukceeg
 # CI/CD with Terraform
 
 Authors: Marta Barriendos Fortuño (martabf@amazon.es)
@@ -86,4 +87,10 @@ git push -u origin main
 
 ### 2. Set up the Repository
 In this step, we can now work in the local GitHub repository to create the project. From this point forward, it is advisable to use a code editor tool such as [Visual Studio Code](https://code.visualstudio.com/) . Within the repository itself, the first task is to generate the main Terraform file (main.tf) which will contain the IaaC to be deployed to AWS. Secondly, create a folder with the path .github\workflows where the YAML file will be housed to configure the workflow with the necessary GitHub Actions.
+
+### 3. AWS Architecture
+
+
+
+### 4. Worflow configuration
 
