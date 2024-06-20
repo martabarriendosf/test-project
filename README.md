@@ -215,4 +215,6 @@ These commands are crucial for managing infrastructure as code (IaC) with Terraf
 
 ### 5. Terraform file configuration
 
+ESPECIFICAR LO DEL BUCKET S3 QUE SE DEFINE EN EL MAIN.TF
+
 
