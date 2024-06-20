@@ -1,7 +1,6 @@
-enecccdkeilbinibthlinffljkurbjhruvduntukceeg
 # CI/CD with Terraform
 
-Authors: Marta Barriendos Fortuño (martabf@amazon.es)
+Authors: Marta Barriendos Fortuño (martabf@amazon.es), Borja Pérez Guasch (bpguasch@amazon.es)
 
 
 ## Introduction
