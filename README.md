@@ -32,7 +32,7 @@ The CI/CD pipeline is configured using GitHub Actions and consists of the follow
 
 ## Project Architecture
 
-![Architecture Diagram](path/to/your/image.png)
+![Architecture Diagram](esquema1.PNG)
 
 The project includes the following components:
 
@@ -89,7 +89,16 @@ git push -u origin main
 In this step, we can now work in the local GitHub repository to create the project. From this point forward, it is advisable to use a code editor tool such as [Visual Studio Code](https://code.visualstudio.com/) . Within the repository itself, the first task is to generate the main Terraform file (main.tf) which will contain the IaaC to be deployed to AWS. Secondly, create a folder with the path .github\workflows where the YAML file will be housed to configure the workflow with the necessary GitHub Actions.
 
 ### 3. AWS Architecture
+In this section, we will use the AWS console with which we must make 3 steps to achieve the desired configuration:
+- **1. Create an IAM user**: [Info about creating a new IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+- **2. Create a S3 bucket**: [Info about creating a new S3 bucket]( https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html)
+- **3. Create a CodeBuild project**: [Info about creating a new CodeBuild project](https://docs.aws.amazon.com/codebuild/latest/userguide/create-project-console.html)
 
+The first step is to create an IAM user with programmatic access, so that this user has an access key and access key ID, which we will use with the first GitHub action (`aws-actions/configure-aws-credentials`) to configure the credentials and access to the AWS environment. Additionally, these credentials must be saved as GitHub secrets. Once the IAM user is created, appropriate permissions need to be assigned since it does not have any by default. This is done using IAM policies. Specifically, we need to grant the IAM user Administrator access (`AdministratorAccess`), access to the S3 bucket (`AmazonS3FullAccess`), and for this project, access to the EC2 instance that Terraform will deploy (`AmazonEC2FullAccess`). 
+
+Similarly, it will be necessary to create the S3 bucket where we will store the Terraform state. When creating the bucket, ensure to enable `Bucket versioning` to be able to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket. Moreover, the name of the S3 bucket will also be saved as a GitHub Secret, to configure the backend for saving the Terrafom state file.
+
+Lastly, it is necessary to create a CodeBuild project. Since the buildspec.yml file will be provided from GitHub, no specific configuration is required through the AWS console. Simply associate the project with the same name that will be assigned in the buildspec for the GitHub action (`aws-actions/aws-codebuild-run-build`) to deploy it properly. Additionally, a default role will be created for this project, so it is important to assign this IAM role permissions for accessing the S3 bucket (as CodeBuild needs to access the Terraform state in that bucket), `AmazonS3FullAccess`, and permissions to deploy the EC2 instance (`AmazonEC2FullAccess`).
 
 
 ### 4. Worflow configuration
