@@ -102,3 +102,48 @@ Lastly, it is necessary to create a CodeBuild project. Since the buildspec.yml f
 
 ### 4. Worflow configuration
 
+Finally, we just need to implement the file YAML that will contain the workflow configuration, that as it has been explained before, will be located in the path `.\github\workflows.`
+The desired idea is to configure the workflow to run when a push is made to the default branch of your repository. Based on the [GitHub Actions workflows documentation](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow), Workflow triggers are defined with the  `on` key, for more information, see ([Workflow syntax for GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idruns-on). To trigger a workflow run, the following steps occur:
+
+- **1)**: An event occurs in your repository, this event will have associated a specific `GITHUB_SHA`(commit SHA) and `GIHUB_REF` (Git ref).
+
+- **2)**: GitHub then searches the `.github/workflows` directory at the repository root for workflow files corresponding to the commit SHA or Git ref associated with the event (this explains the relevance of configuring the workflow files in the proper path).
+
+- **3)**: A workflow run is triggered for any workflows with on: values matching the triggering event. When a workflow runs, GitHub sets the `GITHUB_SHA` (commit SHA) and  `GITHUB_REF` (Git ref) environment variables in the runner environment. The `GITHUB_SHA` will be used later to clone the repository in the AWS Virtual Machine. For more details, see [Variables in GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/variables)
+
+In order to implement this first part, we start giving the workflow a name, that will appear in the "Actions" tab of the GitHub repository:
+```
+name: CI/CD with Terraform
+```
+
+Now we have to specify the trigger for this workflow, in this case the push event in the main branch, so a workflow run is triggered every time someone pushes a change to the repository:
+
+```
+on:
+  push:
+    branches:
+      - main
+```
+The next step is to group together all the jobs that run in the `CI/CD with Terraform` workflow, in this case there's only one job identified by the key `terraform`. Inside this job, three sections must be defined. 
+- **1) runs-on**: This first section configures the virtual machine hosted by GitHub where the `terraform` job will be executed, as will be seen in the code, in this case is configured to run on the latest version of an Ubuntu Linux runner.
+- **2) env**: By using the key `env`, you can set custom environment variables for the workflow. Since it is defined at the top level of the worflow, the scope of these `env` variables will be the entire workflow. As it is shown in the next code, there are 4 environment variables,  `AWS_ACCESS_KEY_ID`,  `AWS_SECRET_ACCESS_KEY`,  `AWS_DEFAULT_REGION` and  `AWS_S3_BUCKET`, that in the third section have been saved as GitHub secrets.
+- **3) steps**: This last section groups together all the steps that run in the `terraform` job. Each item inside this section is a separate action or shell script. To be exact, this section will have the two items or steps corresponding to the two GitHub actions that will be used, and that has been mentioned before, [`aws-actions/configure-aws-credentials`](https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions) and [`aws-actions/aws-codebuild-run-build`](https://github.com/aws-actions/aws-codebuild-run-build).
+
+```
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+
+    
+    steps:
+
+```
+
+
+
