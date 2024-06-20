@@ -84,10 +84,10 @@ git branch -M main
 git push -u origin main
 ```
 
-### 2. Set up the Repository
+### 2. Set up the Repository 
 In this step, we can now work in the local GitHub repository to create the project. From this point forward, it is advisable to use a code editor tool such as [Visual Studio Code](https://code.visualstudio.com/) . Within the repository itself, the first task is to generate the main Terraform file (main.tf) which will contain the IaaC to be deployed to AWS. Secondly, create a folder with the path .github\workflows where the YAML file will be housed to configure the workflow with the necessary GitHub Actions.
 
-### 3. AWS Architecture
+### 3. AWS Architecture and Connection to the GitHub repository
 In this section, we will use the AWS console with which we must make 3 steps to achieve the desired configuration:
 - **1. Create an IAM user**: [Info about creating a new IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
 - **2. Create a S3 bucket**: [Info about creating a new S3 bucket]( https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html)
@@ -97,7 +97,7 @@ The first step is to create an IAM user with programmatic access, so that this u
 
 Similarly, it will be necessary to create the S3 bucket where we will store the Terraform state. When creating the bucket, ensure to enable `Bucket versioning` to be able to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket. Moreover, the name of the S3 bucket will also be saved as a GitHub Secret, to configure the backend for saving the Terrafom state file.
 
-Lastly, it is necessary to create a CodeBuild project. Since the buildspec.yml file will be provided from GitHub, no specific configuration is required through the AWS console. Simply associate the project with the same name that will be assigned in the buildspec for the GitHub action (`aws-actions/aws-codebuild-run-build`) to deploy it properly. Additionally, a default role will be created for this project, so it is important to assign this IAM role permissions for accessing the S3 bucket (as CodeBuild needs to access the Terraform state in that bucket), `AmazonS3FullAccess`, and permissions to deploy the EC2 instance (`AmazonEC2FullAccess`).
+Lastly, it is necessary to create a CodeBuild project. Since the buildspec.yml file will be provided from GitHub, no specific configuration is required through the AWS console. Simply associate the project with the same name that will be assigned in the buildspec for the GitHub action (`aws-actions/aws-codebuild-run-build`) to deploy it properly. Additionally, a default role will be created for this project, so it is important to assign this IAM role permissions for accessing the S3 bucket (as CodeBuild needs to access the Terraform state in that bucket), `AmazonS3FullAccess`, and permissions to deploy the EC2 instance (`AmazonEC2FullAccess`). On the other hand, while configuring the CodeBuild project, GitHub must be specified as Primary Source. Therefore, to stablish the connection between CodeBuild and the GitHub source repository OAuth must be used, to specify the GitHub repository Path in the project.
 
 
 ### 4. Worflow configuration
@@ -145,7 +145,7 @@ jobs:
 
 ```
 
-
+Below is the first step of the workflow job, which consists of configuring the AWS credentials. This GitHub action ([`aws-actions/configure-aws-credentials`](https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions)) implements the AWS JavaScript SDK credential resolution chain and exports session environment variables for your other Actions to use. Additionally, the recommended method for fetching credentials from AWS has been used, which consists of using GitHub's OIDC provider in conjunction with a configured AWS IAM Identity Provider endpoint. Furthermore, following AWS security recommendations for IAM users, the principle of least privilege has been applied: Grant only the permissions required to perform the actions in your GitHub Actions workflows.
 
 ```
  - name: Configure AWS Credentials
@@ -155,5 +155,64 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 ```
+Finally, the last job of the workflow named `Run CodeBuild` is presented in the next code, which consists of deploying the CodeBuild project using the GitHub action [`aws-actions/aws-codebuild-run-build`](https://github.com/aws-actions/aws-codebuild-run-build). It's important to remark that as it has been explained before, the name of the codeBuild project  `project-name: my-codebuild-job2` must be the same that has been given to it before in the AWS Console. On the other hand, using the command `project-name:  buildspec-override` we make sure to override the buildspec file that has been configured by default in the CodeBuild project with the AWS console with the the following inline buildspec. Diving deeper into the inline buildspec, it is clear that has two main phases. 
+
+The `install` phase, is design to set up the project's execution environment installing the necessary utilities, configuring additional resources, and instaling Terraform along with verifying its version, to ensure the environment is properly configured before proceeding with subsequent phases of the build and deployment process. Looking at every detail, `git fetch --depth=1` searches the latest commit from the Git repositoy with a history depth limited to 1, optimizing dowload time and disk space, `git checkout --force ${{ github.sha }}` checks out the specific commit that triggered the workflow on GitHub (which would be a push in the main repsository) using the environment variable  github.sha that contains the SHA of the commit that triggered the workflow (as it has been explained before) and clonning the repository in the AWS Virtual Machine (The Amazon Linux Machine that has been chosen when configuring the CodeBuild project), `git lfs pull` this command pulls down large files that are tracked by Git LFS, so if the repository uses Git LFS (Large File Storage),it ensures all necessary large files for the build are available. Once the repository is available in the AWS Virtual Machine, the rest of the commands are necessary to install terraform, `sudo yum install -y yum-utils` installs yum-utils, which is a collection of utilities for managing software packages and are needed to install terraform, `sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo` adds the HashiCorp repository to the configured yum repositories. This allows yum to search for and download packages provided by HashiCorp from this repository to being able to install Terraform. Finally, `sudo yum -y install terraform` installs Terraform using yum. The -y flag automatically accepts any installation prompts, and with the command `terraform --version` checks the installed version of Terraform on the system. 
+
+The `build` phase has two steps. The first one runs `terraform init` that initializes Terraform for the project. Initialization is necessary to set up the environment, download providers, and prepare the backend for state storage. Additionally, with the `init` command the next options are configured cterraform init -backend-config="bucket=${{ env.AWS_S3_BUCKET }}" -backend-config="key=terraform.tfstate" -backend-config="region=${{ env.AWS_DEFAULT_REGION }}"` , thanks to these options, it is specified the S3 bucket and file (terraform.tfstate) where Terraform will store its state files, using again enviroment variables. The second step runs the command `terraform apply -auto-approve` that applies the Terraform configuration to create or update (depending of the state file of the S3 bucket) the infrastructure as defined in the Terraform files (*.tf). In this step is important to remark the `auto-approve` part, which is essential to automatically approve and appliy changes without prompting for confirmation. since this is the implementation of a CI/CD pipeline where manual intervention is not desired.
+
+To sum up, Terraform reads the configuration files (*.tf) and compares the desired state (defined in these files) with the current state of the infrastructure (saved in the S3 bucket in the terraform.tfstate file). It determines what changes are needed to achieve the desired state (creation, modification, or deletion of resources). If changes are required, Terraform makes API calls to the corresponding cloud provider (in this case, AWS) to provision or modify resources. Once completed, Terraform updates the state file (terraform.tfstate) with the current state of the infrastructure.
+
+There is a third phase called `artifacts` and defines that when the `build` phase succesfully completes, AWS will collect all files and directories and package them as artifacts, which could be used in subsequent seteps of the CI/CD workflow, such as deploying the application to a production environment.
+
+```
+  - name: Run CodeBuild
+        uses: aws-actions/aws-codebuild-run-build@v1
+        with:
+          project-name: my-codebuild-job2
+          disable-source-override: true
+          buildspec-override: |
+            version: 0.2
+            phases:
+              install:
+                commands:
+                  - git fetch --depth=1
+                  - git checkout --force ${{ github.sha }}
+                  - git lfs pull
+                  - sudo yum install -y yum-utils
+                  - sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+                  - sudo yum -y install terraform
+                  - terraform --version
+
+              pre_build:
+                commands:
+                  - echo "Pre-build phase"
+              build:
+                commands:
+                  - terraform init -backend-config="bucket=${{ env.AWS_S3_BUCKET }}" -backend-config="key=terraform.tfstate" -backend-config="region=${{ env.AWS_DEFAULT_REGION }}"
+                  - terraform apply -auto-approve
+
+              post_build:
+                commands:
+                  - echo "Post-build phase"
+
+            artifacts:
+              files:
+                - '**/*'
+```
+
+
+In summary, the build phase executes two main commands related to Terraform:
+
+Initialization (terraform init): Sets up Terraform environment, configures backend settings (S3 bucket for state storage), and prepares for managing infrastructure.
+
+Deployment (terraform apply): Applies the defined Terraform configuration to create or modify infrastructure in AWS based on the configuration files (*.tf), using the settings provided during initialization.
+
+These commands are crucial for managing infrastructure as code (IaC) with Terraform, ensuring consistent and reproducible deployments of AWS resources according to defined configurations.
+
+
+
+
+### 5. Terraform file configuration
 
 
