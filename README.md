@@ -31,7 +31,7 @@ The CI/CD pipeline is configured using GitHub Actions and consists of the follow
 
 ## Project Architecture
 
-![Architecture Diagram](esquema1.PNG)
+![Architecture Diagram](CICD Schema.PNG)
 
 The project includes the following components:
 
