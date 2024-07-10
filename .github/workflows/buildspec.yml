@@ -48,14 +48,10 @@ jobs:
                   - echo "Pre-build phase"
               build:
                 commands:
-                  - terraform init -backend-config="bucket=${{ env.AWS_S3_BUCKET }}" -backend-config="key=terraform.tfstate" -backend-config="region=${{ env.AWS_DEFAULT_REGION }}"
+                  - terraform init 
                   - terraform apply -auto-approve
 
               post_build:
                 commands:
                   - echo "Post-build phase"
 
-            artifacts:
-              files:
-                - '**/*'
-                

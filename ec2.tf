@@ -6,10 +6,12 @@ provider "aws" {
 # store the terraform state file in s3
 terraform {
   backend "s3" {
+    bucket  = "my-unique-bucket-name-martabf"
+    key     = "terraform.tfstate" #Name we want to give to the state file in the bucket
+    region  = "us-east-1"
 
   }
 }
-
 
 # create default vpc if one does not exit
 resource "aws_default_vpc" "default_vpc" {
@@ -93,10 +95,9 @@ resource "aws_instance" "ec2_instance" {
   subnet_id              = aws_default_subnet.default_az1.id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   key_name               = "resume-kp"
-  user_data              = file("install_techmax.sh")
 
   tags = {
-    Name = "techmax server"
+    Name = "EC2 Instance Deployed with CICD"
   }
 }
 
