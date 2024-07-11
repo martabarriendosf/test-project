@@ -23,7 +23,7 @@ The CI/CD pipeline is configured using GitHub Actions and consists of the follow
 ). Finally, within the job, we define two steps that implement two actions developed by AWS for GitHub Actions.
 
 1. **AWS Credentials Configuration**: Uses the [`aws-actions/configure-aws-credentials`](https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions)
- action, that configures your AWS credentials and region environment variables to enable secure connectivity between your GitHub workflows and yor AWS account.
+ action, that configures your AWS credentials and region environment variables to enable secure connectivity between your GitHub workflows and your AWS account.
 2. **CodeBuild Execution**: Uses the [`aws-actions/aws-codebuild-run-build`](https://github.com/aws-actions/aws-codebuild-run-build) action to build and run a CodeBuild project (that executes Terraform), collect the build logs and print them, specifying an inline buildspec definition with the required commands to deploy the Terraform project.
 
 ## Project Architecture
