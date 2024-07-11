@@ -147,3 +147,23 @@ terraform {
 }
 ```
 
+## Update
+
+Once you have everything prepared, you can push your changes to GitHub, and they will be automatically deployed to AWS, if you are using a Code Editor like `Visual Studio Code', just use the button `Commit and Sync`.
+If you are using Git bash:
+
+
+```
+git add .
+
+git commit -m “Initial commit”
+
+git push
+```
+
+## Clean up
+
+1) Access to your project folder where you have the Terraform code that you want to deploy, go to the `.github\workflows path`, and change in the buildspec file the command `terraform apply -auto-approve ` by `terraform destroy -auto-approve`
+2) Go to the AWS Console, navigate to the S3 section, access to your S3 bucket and delete the file `terraform.tfsate`.Then, navigate to the IAM user section and delete the access keys you created before.
+3) Access to the second project where you deploy the CI/CD pipeline resources, navigate to the CLI terminal and run the command `terraform destroy`
+
