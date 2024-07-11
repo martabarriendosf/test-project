@@ -146,7 +146,7 @@ terraform {
 
 ## Update
 
-Once you have everything prepared, you can push your changes to GitHub, and they will be automatically deployed to AWS, if you are using a Code Editor like `Visual Studio Code', just use the button `Commit and Sync`.
+Once you have everything prepared, you can push your changes to GitHub, and they will be automatically deployed to AWS, if you are using a Code Editor like `Visual Studio Code`, just use the button `Commit and Sync`.
 If you are using Git bash:
 
 
