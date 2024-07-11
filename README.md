@@ -16,9 +16,6 @@ This project shows a cloud architecture that implements a CI/CD pipeline capable
 - [Installation](#installation)
 - [Update](#update)
 - [Cleanup](#cleanup)
-- [Using the Tool](#using-the-tool)
-- [Security Considerations](#security-considerations)
-- [Metrics](#metrics)
 
 ## Understanding the CI/CD Pipeline
 
